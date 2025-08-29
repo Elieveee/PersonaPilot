@@ -1,31 +1,28 @@
-# YGIT: Your Guide into Tech
+# PersonaPilot AI
 
-![YGIT Banner](./img/banner.png)
+![PersonaPilot AI Banner](./img/banner.png)
 
-## 🚀 About YGIT
+## 🚀 About PersonaPilot AI
 
-Your Guide into Tech (YGIT) is an innovative application made to provide personalized career roadmaps for individuals looking to break into or advance in the tech industry. Our platform leverages AI to create tailored learning paths, resource recommendations, and career guidance for a wide range of tech roles.
-
-## Read Blogpost ⬇️
-- **YGIT**: [My Motivation and what not](https://ahruf.substack.com/p/ygit-a-streamlit-app-for-personalized)
+PersonaPilot AI, kullanıcıya seçtiği kariyer alanında kişiselleştirilmiş öğrenme ve gelişim planı sunan bir AI-first uygulamadır. Kullanıcı, kısa bir kişilik testiyle öğrenme tarzını ve çalışma tercihini girer. Yapay zekâ, bu verileri analiz ederek adım adım yol haritası ve kaynak önerileri üretir. PDF olarak indirilebilir.
 
 
 ## ✨ Features
 
-- **Personalized Career Roadmaps**: Get a custom-tailored roadmap based on your chosen tech career and experience level.
-- **Comprehensive Resources**: Access curated lists of courses, books, YouTube videos, and articles relevant to your career path.
-- **Project Ideas**: Receive suggestions for hands-on projects to build your portfolio.
-- **Networking Opportunities**: Find communities, forums, and social media accounts to follow for networking and continuous learning.
-- **Job Search Guidance**: Get recommendations for job boards and platforms specific to your tech career.
-- **Tool Recommendations**: Learn about the essential tools and technologies for your chosen field.
-- **PDF Export**: Download your personalized roadmap as a PDF for offline reference.
+- Personalized career roadmaps (by career + experience + personality test)
+- Curated resources: courses, books, videos, articles
+- Project ideas to build portfolio
+- Communities and forums for networking
+- Job boards and platforms for opportunities
+- Tools and technologies to learn
+- PDF export
 
 ## 🛠 Tech Stack
 
-- **Frontend**: Streamlit
-- **Backend**: Python
-- **AI Integration**: OpenAI's GPT model
-- **PDF Generation**: PyMuPDF (fitz)
+- Frontend: Streamlit
+- Backend: Python
+- AI: OpenAI GPT (Chat Completions)
+- PDF: PyMuPDF (fitz)
 
 ## 🚀 Getting Started
 
@@ -36,29 +33,28 @@ Your Guide into Tech (YGIT) is an innovative application made to provide persona
 
 ### Installation
 
-1. Clone the repository:
-2. Install the required dependencies:
-3. Set up your environment variables:
-Create a `.env` file in the root directory and add your OpenAI API key: 
-4. Run the Streamlit app:
-5. Open your browser and navigate to `http://localhost:8501` to use the app.
+1. Clone the repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Create `.env` with `OPENAI_API_KEY=...`
+4. Run: `streamlit run app.py`
+5. Open `http://localhost:8501`
 
 ## 📘 How to Use
 
-1. Enter your desired tech career in the provided input field.
-2. Select your current experience level from the dropdown menu.
-3. Click "Generate Roadmap" to receive your personalized career guide.
-4. Review the generated roadmap on the screen.
-5. Download the PDF version of your roadmap for offline reference.
+1. Fill your name, career and experience level
+2. Complete the short personality test
+3. Click "Generate" on the Profile tab
+4. See your roadmap under the Roadmap tab
+5. Download the PDF
 
 ## 🤝 Contributing
 
-We're excited to welcome new contributors to YGIT! Your ideas and efforts can make a real difference in helping people navigate their tech careers. Here's how you can get involved:
+We welcome contributors to PersonaPilot AI! Your ideas and efforts can make a real difference in helping people navigate their tech careers.
 
-- **Developers**: Help us improve the codebase, add new features, or fix bugs (downloadble pdf formatting).
-- **Designers**: Enhance the user interface and overall user experience.
-- **Tech Experts**: Share your industry knowledge to make our career guidance more accurate and comprehensive.
-- **Community Builders**: Help us grow and manage our community of users and contributors.
+- Developers: Improve code, add features, fix bugs (PDF formatting etc.)
+- Designers: Enhance UI/UX
+- Tech Experts: Enrich guidance accuracy and depth
+- Community Builders: Grow and manage the community
 
 To get started:
 1. Fork the repository
@@ -67,23 +63,22 @@ To get started:
 4. Push to the branch 
 5. Open a Pull Request
 
-Check out our [contribute.md](contribute.md) for more detailed guidelines.
+Check out [contribute.md](contribute.md) for guidelines.
 
 ## 🌟 Join Our Community
 
 We're building more than just a tool - we're creating a community of tech enthusiasts and career changers. Join us to connect, learn, and grow together:
 
-- **Discord**: [Join our Discord server](https://discord)
-- **Whatsapp**: [Join our Whatsapp Community](https://chat.whatsapp.com/GLZMaTCaoq8B3nQbIigPCg)
-- **Twitter**: Follow us [@Yourguide_it](https://x.com/Yourguide_it) for updates 
-and tech career tips
-- **Instagram**: [Follow Us](https://www.instagram.com/yourguide_it/)
+- Discord: [Join our Discord server](https://discord)
+- Whatsapp: [Join our Whatsapp Community](https://chat.whatsapp.com/GLZMaTCaoq8B3nQbIigPCg)
+- Twitter: Follow [@Yourguide_it](https://x.com/Yourguide_it)
+- Instagram: [Follow Us](https://www.instagram.com/yourguide_it/)
 
 - **Contribute**: Check out our [open issues] 
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE).
 
 ## 📬 Contact
 
@@ -91,14 +86,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Email: ahrufdesign@gmail.com
 - Twitter: [@ahruf_](https://x.com/ahruf_)
 
-We're always happy to chat about collaborations, ideas, or any questions you might have!
+We're happy to chat about collaborations, ideas, or questions!
 
 ## 🙏 Acknowledgements
 
-- OpenAI for providing the GPT model
-- Streamlit for the amazing web app framework
-- All our wonderful contributors and supporters
+- OpenAI for GPT models
+- Streamlit for the web app framework
+- All contributors and supporters
 
 ---
 
-Made with ❤️ by the YGIT Community | [Join us in shaping tech careers!](https://github.com/ahrufcodes/YGIT-AI)
+Made with ❤️ by the PersonaPilot AI Community | [Contribute](https://github.com/ahrufcodes/PersonaPilot)

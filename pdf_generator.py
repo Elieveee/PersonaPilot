@@ -77,7 +77,7 @@ from bs4 import BeautifulSoup
 import textwrap
 import re
 
-def generate_pdf_roadmap(career, experience_level, roadmap_content, name=None, personality_summary=None):
+def generate_pdf_roadmap(career, experience_level, roadmap_content, user_info: dict | None = None):
     # Convert markdown to HTML
     html = markdown2.markdown(roadmap_content, extras=['break-on-newline'])
     
@@ -94,16 +94,26 @@ def generate_pdf_roadmap(career, experience_level, roadmap_content, name=None, p
     margin_top = 50
     margin_bottom = 50
 
-    # Add letterhead to the first page
-    letterhead = fitz.Rect(0, 0, page.rect.width, 100)
-    page.insert_image(letterhead, filename="img/letterhead.png")
+    # Add letterhead to the first page (optional)
+    try:
+        letterhead = fitz.Rect(0, 0, page.rect.width, 100)
+        page.insert_image(letterhead, filename="img/letterhead.png")
+    except Exception:
+        # Skip letterhead if asset missing
+        pass
 
     # Add title
-    page.insert_text((margin_left, 120), "Your Tech Career Roadmap", fontsize=18, fontname="helvetica-bold")
+    page.insert_text((margin_left, 120), "PersonaPilot AI: Your Tech Career Roadmap", fontsize=18, fontname="helvetica-bold")
     
     # Add user info, career and experience level
-    if name:
-        page.insert_text((margin_left, 145), f"Name: {name}", fontsize=12, fontname="helvetica")
+    displayed_name = None
+    personality_summary = None
+    if user_info:
+        displayed_name = user_info.get("name") or user_info.get("user_name")
+        personality_summary = user_info.get("personality_summary")
+        persona_full = user_info.get("persona") or {}
+    if displayed_name:
+        page.insert_text((margin_left, 145), f"Name: {displayed_name}", fontsize=12, fontname="helvetica")
         y_info = 165
     else:
         y_info = 150
@@ -148,6 +158,28 @@ def generate_pdf_roadmap(career, experience_level, roadmap_content, name=None, p
         y = insert_text_with_style(personality_summary.strip(), y, 11)
         y += 10
 
+    # Add full test results if present
+    if user_info and persona_full:
+        y = insert_text_with_style("Personality Test Results", y, 16, is_bold=True)
+        y += 5
+        # Render key fields consistently
+        ordered_keys = [
+            "learning_style",
+            "focus_time_minutes",
+            "work_preference",
+            "preferred_resources",
+            "planning_style"
+        ]
+        for key in ordered_keys:
+            if key in persona_full:
+                value = persona_full[key]
+                if isinstance(value, list):
+                    value_str = ', '.join(map(str, value))
+                else:
+                    value_str = str(value)
+                y = insert_text_with_style(f"- {key}: {value_str}", y, 11)
+        y += 10
+
     for element in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul', 'ol']):
         y = process_element(element, y)
 
@@ -159,10 +191,13 @@ def generate_pdf_roadmap(career, experience_level, roadmap_content, name=None, p
     # Add footer to all pages
     for page_num in range(len(doc)):
         page = doc[page_num]
-        page.insert_text((margin_left, page.rect.height - 30), "www.ygit.info", fontsize=8, fontname="helvetica")
+        page.insert_text((margin_left, page.rect.height - 30), "https://github.com/ahrufcodes/PersonaPilot", fontsize=8, fontname="helvetica")
         page.insert_text((page.rect.width - margin_right - 50, page.rect.height - 30), f"Page {page_num + 1}", fontsize=8, fontname="helvetica")
 
     # Save PDF
-    filename = f"{career.replace(' ', '_')}_ygit_roadmap.pdf"
-    doc.save(filename)
-    return filename
+    filename = f"{career.replace(' ', '_')}_persona_roadmap.pdf"
+    try:
+        doc.save(filename)
+        return filename
+    except Exception:
+        return None

@@ -1,6 +1,6 @@
-# Contributing to YGIT (Your Guide into Tech)
+# Contributing to PersonaPilot AI
 
-First off, thank you for considering contributing to YGIT! It's people like you that make YGIT such a great tool for the tech community.
+First off, thank you for considering contributing to PersonaPilot AI! It's people like you that make this such a great tool for the tech community.
 
 ## Table of Contents
 1. [Code of Conduct](#code-of-conduct)
@@ -14,7 +14,7 @@ First off, thank you for considering contributing to YGIT! It's people like you 
 
 ## Code of Conduct
 
-This project and everyone participating in it is governed by the [YGIT Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to [yourguideintotech@gmail.com](mailto:yourguideintotech@gmail.com]).
+This project and everyone participating in it is governed by the Code of Conduct. By participating, you are expected to uphold this code. Please report unacceptable behavior to the maintainers.
 
 ## What we're looking for
 
@@ -60,7 +60,7 @@ We're looking for various types of contributions:
 ## Submitting a pull request
 
 1. Push your changes to your fork.
-2. Submit a pull request to the `master` branch of the YGIT repository.
+2. Submit a pull request to the `main` branch of the PersonaPilot repository.
 3. Include a clear title and description of your changes.
 4. Link any relevant issues in the pull request description.
 
@@ -71,8 +71,8 @@ We also welcome non-code contributions:
 - Suggest improvements for the career roadmaps
 - Recommend valuable resources for different tech careers
 - Help with community management and support
-- Create tutorials or blog posts about using YGIT
-- Spread the word about YGIT on social media
+- Create tutorials or blog posts about using PersonaPilot AI
+- Spread the word about PersonaPilot AI on social media
 
 ## Questions?
 
@@ -85,4 +85,4 @@ Don't hesitate to reach out if you have any questions! You can:
 and tech career tips
 - **Instagram**: [Follow Us](https://www.instagram.com/yourguide_it/)
 
-Thank you for your interest in contributing to YGIT. Your efforts help make tech careers more accessible for everyone!
+Thank you for your interest in contributing to PersonaPilot AI. Your efforts help make tech careers more accessible for everyone!

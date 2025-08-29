@@ -17,7 +17,7 @@ client = OpenAI(
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 # UI Configuration
-st.set_page_config(page_title="YGIT", page_icon="💙")
+st.set_page_config(page_title="PersonaPilot AI", page_icon="💙")
 
 
 # Google Font URL and CSS Injection for Styling
@@ -36,54 +36,176 @@ h1, h2, h3 {{
 st.markdown(css_code, unsafe_allow_html=True)
 
 
-# Display an Image Banner
+# ----- Helper functions (defined before UI is executed) -----
+def to_score(choice: str) -> int:
+    mapping = {
+        'Strongly Disagree': 1,
+        'Disagree': 2,
+        'Neutral': 3,
+        'Agree': 4,
+        'Strongly Agree': 5
+    }
+    return mapping.get(choice, 3)
+
+
+def build_personality_summary_from_choices(q1_choice: str, q2_choice: str, q3_choice: str, q4_choice: str, q5_choice: str) -> str:
+    scores = {
+        'analytical': to_score(q1_choice),
+        'creative': to_score(q2_choice),
+        'collaborative': to_score(q3_choice),
+        'structured': to_score(q4_choice),
+        'experimental': to_score(q5_choice)
+    }
+    strengths = []
+    if scores['analytical'] >= 4:
+        strengths.append('analytical and data-oriented')
+    if scores['creative'] >= 4:
+        strengths.append('creative and design-focused')
+    if scores['collaborative'] >= 4:
+        strengths.append('collaborative and communication-driven')
+    if scores['structured'] >= 4:
+        strengths.append('organized with a preference for structure and planning')
+    if scores['experimental'] >= 4:
+        strengths.append('curious and hands-on, comfortable with experimentation')
+
+    growth = []
+    if scores['analytical'] <= 2:
+        growth.append('strengthen analytical problem-solving')
+    if scores['creative'] <= 2:
+        growth.append('explore more creative exercises')
+    if scores['collaborative'] <= 2:
+        growth.append('practice collaboration and communication')
+    if scores['structured'] <= 2:
+        growth.append('develop consistent routines and planning habits')
+    if scores['experimental'] <= 2:
+        growth.append('try lightweight experiments to learn by doing')
+
+    parts = []
+    if strengths:
+        parts.append('Key strengths: ' + ', '.join(strengths) + '.')
+    if growth:
+        parts.append('Growth areas: ' + ', '.join(growth) + '.')
+    if not parts:
+        parts.append('Balanced profile with adaptable learning preferences.')
+    return ' '.join(parts)
+
+
+def get_career_roadmap(career, experience_level, name, personality_profile):
+    prompt_message = (
+        "Create a detailed, step-by-step learning roadmap for a user based on their career field, "
+        "experience level, and personality profile (learning style, focus time, work preference). "
+        "Include courses, books, project ideas, communities, and tools.\n\n"
+        f"User name: {name}\n"
+        f"Career field: {career}\n"
+        f"Experience level: {experience_level}\n"
+        f"Personality profile (JSON): {personality_profile}\n\n"
+        "Format the output in Markdown with these sections: \n"
+        "# Weekly Goals\n"
+        "# Recommended Courses\n"
+        "# Project Ideas\n"
+        "# Communities and Forums\n"
+        "# Tools and Technologies\n"
+        "Use bullet points or numbered lists where appropriate."
+    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are an assistant skilled in providing comprehensive career guidance. You offer detailed insights into various tech careers, including educational resources, practical tips, and professional development strategies"},
+                {"role": "user", "content": prompt_message}
+            ],
+            temperature=0.5,
+            max_tokens=1200,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+        )
+
+        if response.choices:
+            return response.choices[0].message.content
+        else:
+            return "No response was generated."
+    except Exception as e:
+        err_text = str(e)
+        if 'insufficient_quota' in err_text or 'You exceeded your current quota' in err_text:
+            return "__QUOTA_ERROR__" + err_text
+        return f"Error processing your request: {err_text}"
+
+
+# Display an Image Banner (replace with PersonaPilot AI banner when available)
 st.image('img/banner.png', use_column_width=True)
 # App Main Content
-st.header('Your Guide into Tech: Career Roadmap')
+st.header('PersonaPilot AI: Personalized Roadmap')
 
 
-# User Inputs
-name = st.text_input('Your Name Please')
-career = st.text_input('Which tech career would you like to pursue or learn more about?')
-experience_level = st.selectbox(
-    'Select your current experience level:',
-    ('Beginner', 'Intermediate', 'Advanced', 'Expert')
-)
+tabs = st.tabs(['Profile', 'Roadmap'])
 
-# Personality Test (required fields)
-st.subheader('Quick Personality Test')
-st.caption('We use this to tailor your roadmap to your style.')
+with tabs[0]:
+    # User Inputs
+    name = st.text_input('Your Name')
+    career = st.text_input('Which tech career are you interested in?')
+    experience_level = st.selectbox(
+        'Experience level',
+        ('Beginner', 'Intermediate', 'Advanced', 'Expert')
+    )
 
-learning_style = st.selectbox('Learning style', ['Visual', 'Auditory', 'Kinesthetic'])
-focus_time = st.slider('Average focus time (minutes)', min_value=15, max_value=120, value=45, step=5)
-work_preference = st.selectbox('Work preference', ['Individual', 'Team'])
+    # Personality Test (required fields)
+    st.subheader('Quick Personality Test')
+    st.caption('We use this to tailor your roadmap to your style.')
 
-preferred_resources = st.multiselect('Preferred resource types', ['Courses', 'Books', 'Videos', 'Docs/Articles', 'Interactive Labs'], default=['Courses', 'Videos'])
-planning_style = st.selectbox('Planning style', ['Flexible', 'Balanced', 'Structured'], index=1)
+    learning_style = st.selectbox('Learning style', ['Visual', 'Auditory', 'Kinesthetic'])
+    focus_time = st.slider('Average focus time (minutes)', min_value=15, max_value=120, value=45, step=5)
+    work_preference = st.selectbox('Work preference', ['Individual', 'Team'])
 
-persona = {
-    'learning_style': learning_style,
-    'focus_time_minutes': focus_time,
-    'work_preference': work_preference,
-    'preferred_resources': preferred_resources,
-    'planning_style': planning_style
-}
+    preferred_resources = st.multiselect('Preferred resource types', ['Courses', 'Books', 'Videos', 'Docs/Articles', 'Interactive Labs'], default=['Courses', 'Videos'])
+    planning_style = st.selectbox('Planning style', ['Flexible', 'Balanced', 'Structured'], index=1)
 
-if 'persona' not in st.session_state:
-    st.session_state['persona'] = {}
-st.session_state['persona'] = persona
+    persona = {
+        'name': name,
+        'career': career,
+        'experience_level': experience_level,
+        'learning_style': learning_style,
+        'focus_time_minutes': focus_time,
+        'work_preference': work_preference,
+        'preferred_resources': preferred_resources,
+        'planning_style': planning_style
+    }
 
-# Short Personality Quiz
-st.subheader('Additional preferences')
-st.caption('Optional: these help fine-tune tone and practice suggestions.')
+    if 'persona' not in st.session_state:
+        st.session_state['persona'] = {}
+    st.session_state['persona'] = persona
 
-likert = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
+    # Additional preferences (optional)
+    st.subheader('Additional preferences (optional)')
+    st.caption('These help fine-tune tone and practice suggestions.')
 
-q1 = st.select_slider('I enjoy solving logical, data-driven problems.', options=likert, value='Agree')
-q2 = st.select_slider('I prefer creative, visual or design-focused work.', options=likert, value='Neutral')
-q3 = st.select_slider('I thrive when collaborating and communicating with others.', options=likert, value='Agree')
-q4 = st.select_slider('I like structured plans, checklists, and clear processes.', options=likert, value='Agree')
-q5 = st.select_slider('I’m comfortable experimenting and learning by trying things out.', options=likert, value='Agree')
+    likert = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
+
+    q1 = st.select_slider('I enjoy solving logical, data-driven problems.', options=likert, value='Agree')
+    q2 = st.select_slider('I prefer creative, visual or design-focused work.', options=likert, value='Neutral')
+    q3 = st.select_slider('I thrive when collaborating and communicating with others.', options=likert, value='Agree')
+    q4 = st.select_slider('I like structured plans, checklists, and clear processes.', options=likert, value='Agree')
+    q5 = st.select_slider('I am comfortable experimenting and learning by trying things out.', options=likert, value='Agree')
+
+    # Build and store personality summary
+    personality_summary = None
+    try:
+        personality_summary = build_personality_summary_from_choices(q1, q2, q3, q4, q5)
+        st.session_state['personality_summary'] = personality_summary
+    except Exception:
+        pass
+
+    # Generate action
+    if st.button('Generate Roadmap'):
+        if career and experience_level and name:
+            with st.spinner(f'{name}, we are preparing your roadmap 🍳 please wait...'):
+                roadmap_md = get_career_roadmap(career, experience_level, name, st.session_state.get('persona', {}))
+                if isinstance(roadmap_md, str) and roadmap_md.startswith('__QUOTA_ERROR__'):
+                    st.error('OpenAI quota seems exhausted. Please check your billing or try again later.')
+                    st.stop()
+                st.session_state['roadmap_md'] = roadmap_md
+                st.session_state['personality_summary'] = personality_summary
+            st.success('Ready! You can view it under the Roadmap tab below.')
 
 def to_score(choice: str) -> int:
     mapping = {
@@ -136,8 +258,7 @@ def build_personality_summary() -> str:
         parts.append('Balanced profile with adaptable learning preferences.')
     return ' '.join(parts)
 
-personality_summary = build_personality_summary()
-
+# Build enforced-structure prompt
 def get_career_roadmap(career, experience_level, name, personality_profile):
     prompt_message = (
         "Create a detailed, step-by-step learning roadmap for a user based on their career field, "
@@ -146,8 +267,14 @@ def get_career_roadmap(career, experience_level, name, personality_profile):
         f"User name: {name}\n"
         f"Career field: {career}\n"
         f"Experience level: {experience_level}\n"
-        f"Personality profile (JSON): {personality_profile}\n"
-        "Deliver in structured markdown with clear sections, bullet points, and step-wise progression."
+        f"Personality profile (JSON): {personality_profile}\n\n"
+        "Format the output in Markdown with these sections: \n"
+        "# Weekly Goals\n"
+        "# Recommended Courses\n"
+        "# Project Ideas\n"
+        "# Communities and Forums\n"
+        "# Tools and Technologies\n"
+        "Use bullet points or numbered lists where appropriate."
     )
     try:
         response = client.chat.completions.create(
@@ -168,31 +295,49 @@ def get_career_roadmap(career, experience_level, name, personality_profile):
         else:
             return "No response was generated."
     except Exception as e:
-            return f"Error processing your request: {str(e)}"
+        return f"Error processing your request: {str(e)}"
 
+# Render and PDF wiring
 
-
-if st.button('Generate Roadmap'):
-    if career and experience_level and name:
-        with st.spinner(f' {name} we are cooking 🍳 your roadmap  please wait a minute...'):
-            roadmap = get_career_roadmap(career, experience_level, name, st.session_state.get('persona', {}))
-            st.success(f'Yay! here is your roadmap, happy learning 🤍')
-        st.markdown(f"### Here is Your Personalized Tech Career Roadmap {name}")
-        with st.expander('Personality profile used for personalization'):
+with tabs[1]:
+    st.markdown(f"### Hello {st.session_state.get('persona', {}).get('name', '')}, here is your personalized roadmap")
+    if 'roadmap_md' in st.session_state:
+        with st.expander('Personality profile (used for personalization)'):
             st.json(st.session_state.get('persona', {}))
-        st.markdown(roadmap, unsafe_allow_html=True)
+        # Indicate if demo fallback is shown
+        if '(Demo)' in st.session_state['roadmap_md']:
+            st.warning("Demo fallback is shown (likely due to quota or connection). Update your OPENAI_API_KEY and try again.")
+        st.markdown(st.session_state['roadmap_md'], unsafe_allow_html=True)
 
-        # Generate PDF
-        pdf_filename = generate_pdf_roadmap(career, experience_level, roadmap, name=name, personality_summary=personality_summary)
-        
-        # Offer PDF for download
-        with open(pdf_filename, "rb") as pdf_file:
-            PDFbyte = pdf_file.read()
-        
-        st.download_button(label="Download PDF Roadmap",
-                           data=PDFbyte,
-                           file_name=pdf_filename,
-                           mime='application/octet-stream')
+        user_info = {
+            'name': st.session_state.get('persona', {}).get('name', ''),
+            'user_name': st.session_state.get('persona', {}).get('name', ''),
+            'personality_summary': st.session_state.get('personality_summary', ''),
+            'persona': st.session_state.get('persona', {})
+        }
+        pdf_filename = generate_pdf_roadmap(
+            st.session_state.get('persona', {}).get('career', ''),
+            st.session_state.get('persona', {}).get('experience_level', ''),
+            st.session_state['roadmap_md'],
+            user_info=user_info
+        )
+        try:
+            if os.path.exists(pdf_filename):
+                with open(pdf_filename, "rb") as pdf_file:
+                    PDFbyte = pdf_file.read()
+                st.download_button(
+                    label="Download PDF Roadmap",
+                    data=PDFbyte,
+                    file_name=pdf_filename,
+                    mime='application/pdf',
+                    key="download_pdf_button"
+                )
+            else:
+                st.error("PDF could not be generated. Please try again.")
+        except Exception as e:
+            st.error(f"PDF error: {e}")
+    else:
+        st.info("First, fill in your information on the 'Profile' tab and click 'Generate Roadmap'.")
 
 
 
@@ -261,13 +406,13 @@ footer = """
 <div class="footer">
     <div class="footer-content">
         <div class="footer-left">
-            <p>© 2024 YGIT </p>
+            <p>© 2025 PersonaPilot AI</p>
         </div>
         <div class="footer-right">
             <p>Developed with <span class="heart">❤️</span> by 
-                <a href="https://github.com/ahrufcodes" target="_blank">
+                <a href="https://github.com/Elieveee/PersonaPilot/branches" target="_blank">
                     <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" class="github-icon" alt="GitHub">
-                    ahruf
+                    elieveee
                 </a>
             </p>
         </div>
