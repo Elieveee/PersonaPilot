@@ -77,7 +77,7 @@ from bs4 import BeautifulSoup
 import textwrap
 import re
 
-def generate_pdf_roadmap(career, experience_level, roadmap_content):
+def generate_pdf_roadmap(career, experience_level, roadmap_content, name=None, personality_summary=None):
     # Convert markdown to HTML
     html = markdown2.markdown(roadmap_content, extras=['break-on-newline'])
     
@@ -101,13 +101,18 @@ def generate_pdf_roadmap(career, experience_level, roadmap_content):
     # Add title
     page.insert_text((margin_left, 120), "Your Tech Career Roadmap", fontsize=18, fontname="helvetica-bold")
     
-    # Add career and experience level
-    page.insert_text((margin_left, 150), f"Career: {career}", fontsize=14, fontname="helvetica-bold")
-    page.insert_text((margin_left, 170), f"Experience Level: {experience_level}", fontsize=14, fontname="helvetica-bold")
+    # Add user info, career and experience level
+    if name:
+        page.insert_text((margin_left, 145), f"Name: {name}", fontsize=12, fontname="helvetica")
+        y_info = 165
+    else:
+        y_info = 150
+    page.insert_text((margin_left, y_info), f"Career: {career}", fontsize=14, fontname="helvetica-bold")
+    page.insert_text((margin_left, y_info + 20), f"Experience Level: {experience_level}", fontsize=14, fontname="helvetica-bold")
 
     # Add content
     content_width = page.rect.width - margin_left - margin_right
-    y = 200
+    y = 220
 
     def insert_text_with_style(text, y, fontsize, is_bold=False, indent=0):
         font = "helvetica-bold" if is_bold else "helvetica"
@@ -135,6 +140,13 @@ def generate_pdf_roadmap(career, experience_level, roadmap_content):
                 for nested_list in li.find_all(['ul', 'ol'], recursive=False):
                     y = process_element(nested_list, y, level+1)
         return y
+
+    # Add personality summary section if provided
+    if personality_summary:
+        y = insert_text_with_style("Personality Insights", y, 16, is_bold=True)
+        y += 5
+        y = insert_text_with_style(personality_summary.strip(), y, 11)
+        y += 10
 
     for element in soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'ul', 'ol']):
         y = process_element(element, y)
