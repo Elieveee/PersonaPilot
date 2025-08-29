@@ -15,6 +15,7 @@ client = OpenAI(
     api_key=os.environ.get("OPENAI_API_KEY")
 )
 
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 # UI Configuration
 st.set_page_config(page_title="YGIT", page_icon="💙")
 
