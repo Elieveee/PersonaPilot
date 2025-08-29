@@ -50,9 +50,32 @@ experience_level = st.selectbox(
     ('Beginner', 'Intermediate', 'Advanced', 'Expert')
 )
 
+# Personality Test (required fields)
+st.subheader('Quick Personality Test')
+st.caption('We use this to tailor your roadmap to your style.')
+
+learning_style = st.selectbox('Learning style', ['Visual', 'Auditory', 'Kinesthetic'])
+focus_time = st.slider('Average focus time (minutes)', min_value=15, max_value=120, value=45, step=5)
+work_preference = st.selectbox('Work preference', ['Individual', 'Team'])
+
+preferred_resources = st.multiselect('Preferred resource types', ['Courses', 'Books', 'Videos', 'Docs/Articles', 'Interactive Labs'], default=['Courses', 'Videos'])
+planning_style = st.selectbox('Planning style', ['Flexible', 'Balanced', 'Structured'], index=1)
+
+persona = {
+    'learning_style': learning_style,
+    'focus_time_minutes': focus_time,
+    'work_preference': work_preference,
+    'preferred_resources': preferred_resources,
+    'planning_style': planning_style
+}
+
+if 'persona' not in st.session_state:
+    st.session_state['persona'] = {}
+st.session_state['persona'] = persona
+
 # Short Personality Quiz
-st.subheader('Quick Personality Quiz')
-st.caption('Answer a few questions so we can tailor your roadmap to your style.')
+st.subheader('Additional preferences')
+st.caption('Optional: these help fine-tune tone and practice suggestions.')
 
 likert = ['Strongly Disagree', 'Disagree', 'Neutral', 'Agree', 'Strongly Agree']
 
@@ -115,16 +138,16 @@ def build_personality_summary() -> str:
 
 personality_summary = build_personality_summary()
 
-def get_career_roadmap(career, experience_level, name, personality_summary):
+def get_career_roadmap(career, experience_level, name, personality_profile):
     prompt_message = (
-        f"Create a detailed and structured step-by-step learning roadmap for {career} at a {experience_level.lower()} level. "
-        f"Include an a detailed introduction to the field, all what to know about it, what they need to know at this level, links to courses, book recommendations,"
-        f"Include YouTube videos/playlists, and article recommendations. Provide hands-on project ideas and GitHub repositories where applicable. "
-        f"Also, include a list of communities, forums, and social media accounts to follow for networking and learning. "
-        f"Include a list of job boards, websites, and platforms to find job opportunities and internships. "
-        f"Lastly, provide a list of tools, software, and technologies to learn and master for this career. "
-        f"Personalize this roadmap for {name}. "
-        f"Consider this personality summary when tailoring tone, resources, and practice: {personality_summary}"
+        "Create a detailed, step-by-step learning roadmap for a user based on their career field, "
+        "experience level, and personality profile (learning style, focus time, work preference). "
+        "Include courses, books, project ideas, communities, and tools.\n\n"
+        f"User name: {name}\n"
+        f"Career field: {career}\n"
+        f"Experience level: {experience_level}\n"
+        f"Personality profile (JSON): {personality_profile}\n"
+        "Deliver in structured markdown with clear sections, bullet points, and step-wise progression."
     )
     try:
         response = client.chat.completions.create(
@@ -152,11 +175,11 @@ def get_career_roadmap(career, experience_level, name, personality_summary):
 if st.button('Generate Roadmap'):
     if career and experience_level and name:
         with st.spinner(f' {name} we are cooking 🍳 your roadmap  please wait a minute...'):
-            roadmap = get_career_roadmap(career, experience_level, name, personality_summary)
+            roadmap = get_career_roadmap(career, experience_level, name, st.session_state.get('persona', {}))
             st.success(f'Yay! here is your roadmap, happy learning 🤍')
         st.markdown(f"### Here is Your Personalized Tech Career Roadmap {name}")
-        with st.expander('Personality insights used for personalization'):
-            st.write(personality_summary)
+        with st.expander('Personality profile used for personalization'):
+            st.json(st.session_state.get('persona', {}))
         st.markdown(roadmap, unsafe_allow_html=True)
 
         # Generate PDF
